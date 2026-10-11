@@ -122,7 +122,7 @@ export class Spotify {
                 throw new Error(`Spotify Auth API returned status ${response.status}`);
             }
 
-            const data = await response.json();
+            const data = await response.json() as { access_token: string; expires_in: number };
 
             const token: SpotifyToken = {
                 clientId,
@@ -212,14 +212,20 @@ export class Spotify {
         }
     }
 
+private lastRefreshAttempt = 0;
+    private readonly REFRESH_COOLDOWN = 2 * 60 * 1000; // 2 minutes cooldown
+
     private initializeProactiveRefresh(): void {
         const checkAndRefresh = async () => {
             try {
                 if (this.anonymousToken && !this.isRefreshing) {
                     const timeUntilExpiry = this.anonymousToken.accessTokenExpirationTimestampMs - Date.now();
+                    const now = Date.now();
 
-                    if (timeUntilExpiry <= this.PROACTIVE_REFRESH_BUFFER) {
+                    // Proactively refresh only if within buffer AND cooldown has passed
+                    if (timeUntilExpiry <= this.PROACTIVE_REFRESH_BUFFER && (now - this.lastRefreshAttempt) > this.REFRESH_COOLDOWN) {
                         logs('info', `Anonymous token expires in ${Math.round(timeUntilExpiry / 1000 / 60)} minutes - proactively refreshing`);
+                        this.lastRefreshAttempt = now;
                         await this.refreshAnonymousToken();
                     }
                 }
