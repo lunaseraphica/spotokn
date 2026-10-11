@@ -39,7 +39,8 @@ info "Base directory: $DIR/src/app.ts"
 # ——————————————————————————————————————————————————————————————————
 
 info "Installing system dependencies for Playwright..."
-
+npx playwright install
+npx playwright install-deps
 # Update package list
 apt-get update -qq
 
