@@ -259,7 +259,7 @@ private lastRefreshAttempt = 0;
         return [{
             name: 'sp_dc',
             value: rawEnvCookie,
-            domain: '.spotify.com',
+            domain: 'open.spotify.com',
             path: '/',
             expires: -1,
             httpOnly: true,
